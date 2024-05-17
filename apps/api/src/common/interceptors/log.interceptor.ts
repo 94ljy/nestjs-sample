@@ -1,0 +1,65 @@
+import { Logger } from '@app/logger';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { Observable, catchError, tap } from 'rxjs';
+
+@Injectable()
+export class LogInterceptor implements NestInterceptor {
+  constructor(private readonly logger: Logger) {}
+
+  intercept(
+    ctx: ExecutionContext,
+    next: CallHandler<any>,
+  ): Observable<any> | Promise<Observable<any>> {
+    const request = ctx.switchToHttp().getRequest<Request>();
+    const response = ctx.switchToHttp().getResponse();
+
+    const startTime = Date.now();
+
+    this.logger.log(
+      {
+        method: request.method,
+        path: request.path,
+        query: request.query,
+        body: request.body,
+      },
+      LogInterceptor.name,
+    );
+
+    return next.handle().pipe(
+      tap((body) => {
+        const responseTime = Date.now() - startTime;
+
+        const responseLog = {
+          method: request.method,
+          path: request.path,
+          responseTime,
+          statusCode: response.statusCode,
+          body: body,
+        };
+
+        this.logger.log(responseLog, LogInterceptor.name);
+      }),
+      catchError((error) => {
+        const responseTime = Date.now() - startTime;
+
+        const responseLog = {
+          method: request.method,
+          path: request.path,
+          responseTime,
+          statusCode: response.statusCode,
+          error: error,
+        };
+
+        this.logger.error(responseLog, LogInterceptor.name);
+
+        throw error;
+      }),
+    );
+  }
+}

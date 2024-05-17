@@ -1,0 +1,42 @@
+{
+  "family": "development-api",
+  "executionRoleArn": "arn:aws:iam::975049908398:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "development-api",
+      "image": "975049908398.dkr.ecr.ap-northeast-2.amazonaws.com/development-api",
+      "cpu": 256,
+      "memory": 256,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000
+        }
+      ],
+      "environmentFiles": [
+        {
+          "value": "arn:aws:s3:::zero-dev-api/.development.env",
+          "type": "s3"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/development-api",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      }
+    }
+  ],
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["EC2"],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "cpu": "256",
+  "memory": "256"
+}

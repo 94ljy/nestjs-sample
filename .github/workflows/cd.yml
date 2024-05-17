@@ -1,0 +1,62 @@
+name: Deploy
+
+on:
+  push:
+    braches: ['development']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set Env
+        run: |
+          echo ECR_REPOSITORY=development-api >> $GITHUB_ENV
+          echo ECS_CLUSTER=development-api >> $GITHUB_ENV
+          echo ECS_SERVICE=development-api >> $GITHUB_ENV
+          echo ECS_TASK_DEFINITION=development-api >> $GITHUB_ENV
+          echo IMAGE_TAG=$GITHUB_SHA >> $GITHUB_ENV
+          echo TASK_DEFINITION_PATH=deploy/development.json >> $GITHUB_ENV
+          echo ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }} >> $GITHUB_ENV
+
+      - name: Build and Push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: .
+          tags: ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: task-definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.TASK_DEFINITION_PATH }}
+          container-name: ${{ env.ECS_SERVICE }}
+          image: ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+
+      - name: deploy
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
