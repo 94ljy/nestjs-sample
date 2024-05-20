@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AuthApiModule } from './auth-api/auth-api.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TraceInterceptor } from './common/interceptors/trace.interceptor';
 import { LoggerModule } from '@app/logger';
@@ -10,10 +9,12 @@ import {
 } from './common/exception.filter';
 import { LogInterceptor } from './common/interceptors/log.interceptor';
 import { ApiAuthGuard } from './common/guards/auth.guard';
+import { AuthApiController } from './auth-api/auth-api.controller';
+import { DomainModule } from '@app/domain/domain.module';
 
 @Module({
-  controllers: [HealthController],
-  imports: [AuthApiModule, LoggerModule],
+  controllers: [HealthController, AuthApiController],
+  imports: [DomainModule, LoggerModule],
   providers: [
     {
       provide: APP_INTERCEPTOR,
