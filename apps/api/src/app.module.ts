@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TraceInterceptor } from './common/interceptors/trace.interceptor';
 import { LoggerModule } from '@app/logger';
-import { HealthController } from './health/health.controller';
+import { HealthController } from './health-api/health.controller';
 import {
   AllExceptionFilter,
   HttpExceptionFilter,
