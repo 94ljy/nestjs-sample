@@ -6,11 +6,12 @@ import { CreateUserDto } from '@app/domain/service/user/dto/createUser.dto';
 import { SigninRequestDto } from './dto/signinRequest.dto';
 import { Request } from 'express';
 import { RequestUser } from '../common/requestUser';
-import { ApiAuthGuard } from '../common/auth.guard';
+import { ApiAuthGuard } from '../common/guards/auth.guard';
 import { Logger } from '@app/logger';
 import { AuthService } from '@app/domain/service/auth/auth.service';
 import { LoginDto } from '@app/domain/service/auth/dto/login.dto';
 import { SignupDto } from '@app/domain/service/auth/dto/signup.dto';
+import { Public } from '../common/guards/public.decorator';
 
 @Controller('/auth')
 export class AuthApiController {
@@ -20,6 +21,7 @@ export class AuthApiController {
     private readonly logger: Logger,
   ) {}
 
+  @Public()
   @Post('/signup')
   async signup(@Body() signupRequestDto: SignupRequestDto) {
     const signupDto = new SignupDto(
@@ -32,6 +34,7 @@ export class AuthApiController {
     return BaseResponseDto.OK();
   }
 
+  @Public()
   @Post('/signin')
   async signin(
     @Req() req: Request,
@@ -63,7 +66,6 @@ export class AuthApiController {
   }
 
   @Get('/whoami')
-  @UseGuards(ApiAuthGuard)
   async whoami(@RequestUser() user: RequestUser) {
     return BaseResponseDto.OK_WITH_MESSAGE(user);
   }
