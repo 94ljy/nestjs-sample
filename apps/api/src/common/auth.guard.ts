@@ -1,6 +1,12 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request } from 'express';
 
+@Injectable()
 export class ApiAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
@@ -9,6 +15,6 @@ export class ApiAuthGuard implements CanActivate {
       return true;
     }
 
-    return false;
+    throw new UnauthorizedException();
   }
 }

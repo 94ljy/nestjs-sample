@@ -5,6 +5,7 @@ import * as session from 'express-session';
 import { Redis } from 'ioredis';
 import { RedisConfig } from '@app/config/redisConfig';
 import RedisStore from 'connect-redis';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

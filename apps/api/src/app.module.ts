@@ -4,7 +4,10 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TraceInterceptor } from './common/interceptors/trace.interceptor';
 import { LoggerModule } from '@app/logger';
 import { HealthController } from './health/health.controller';
-import { ExceptionFilter } from './common/exception.filter';
+import {
+  AllExceptionFilter,
+  HttpExceptionFilter,
+} from './common/exception.filter';
 import { LogInterceptor } from './common/interceptors/log.interceptor';
 
 @Module({
@@ -21,7 +24,11 @@ import { LogInterceptor } from './common/interceptors/log.interceptor';
     },
     {
       provide: APP_FILTER,
-      useClass: ExceptionFilter,
+      useClass: AllExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })

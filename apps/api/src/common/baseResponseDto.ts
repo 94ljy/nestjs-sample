@@ -29,7 +29,7 @@ export class BaseResponseDto<T> {
   static ERROR() {
     const response = new BaseResponseDto();
     response.status = 'ERROR';
-    response.message = 'Internal server error';
+    response.message = 'Something went wrong';
 
     return response;
   }
