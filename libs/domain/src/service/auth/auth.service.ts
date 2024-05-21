@@ -6,6 +6,7 @@ import { Logger } from '@app/logger';
 import { Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
+import { InvalidRequestError } from '@app/domain/error/invalidRequest.error';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(signupDto.email);
 
     if (user !== null) {
-      throw new Error('User already exists');
+      throw new InvalidRequestError('User already exists');
     }
 
     const newUser = await this.userRepository.save(new User(signupDto.email));
@@ -40,19 +41,19 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(loginDto.email);
 
     if (user === null) {
-      throw new Error('User not found');
+      throw new InvalidRequestError('User not found');
     }
 
     const auth = await this.authRepository.findByUserId(user.id);
 
     if (auth === null) {
-      throw new Error('Auth not found');
+      throw new InvalidRequestError('Auth not found');
     }
 
     const isLogin = auth.login(loginDto.password);
 
     if (!isLogin) {
-      throw new Error('Password is incorrect');
+      throw new InvalidRequestError('Password is incorrect');
     }
 
     await this.authRepository.save(auth);

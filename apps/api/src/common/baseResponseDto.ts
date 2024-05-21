@@ -1,12 +1,13 @@
+import { ErrorCode } from '@app/domain/error/invalidRequest.error';
+
 export class BaseResponseDto<T> {
   status: string;
-  message: string;
+  errorCode?: ErrorCode;
   data: T;
 
   static OK() {
     const response = new BaseResponseDto();
     response.status = 'OK';
-    response.message = '';
     response.data = null;
     return response;
   }
@@ -14,7 +15,6 @@ export class BaseResponseDto<T> {
   static OK_WITH_MESSAGE<T>(data: T) {
     const response = new BaseResponseDto<T>();
     response.status = 'OK';
-    response.message = '';
     response.data = data;
     return response;
   }
@@ -22,14 +22,14 @@ export class BaseResponseDto<T> {
   static UNAUTHORIZED() {
     const response = new BaseResponseDto();
     response.status = 'UNAUTHORIZED';
-    response.message = 'Unauthorized';
     return response;
   }
 
-  static ERROR() {
+  static ERROR(data?: any, errorCode?: ErrorCode) {
     const response = new BaseResponseDto();
     response.status = 'ERROR';
-    response.message = 'Something went wrong';
+    response.data = data;
+    response.errorCode = errorCode;
 
     return response;
   }

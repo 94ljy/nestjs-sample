@@ -6,6 +6,7 @@ import { HealthController } from './health-api/health.controller';
 import {
   AllExceptionFilter,
   HttpExceptionFilter,
+  BaseErrorFilter,
 } from './common/exception.filter';
 import { LogInterceptor } from './common/interceptors/log.interceptor';
 import { ApiAuthGuard } from './common/guards/auth.guard';
@@ -31,6 +32,10 @@ import { DomainModule } from '@app/domain/domain.module';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: BaseErrorFilter,
     },
     {
       provide: APP_GUARD,

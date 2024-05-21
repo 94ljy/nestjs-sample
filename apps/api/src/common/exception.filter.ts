@@ -4,9 +4,11 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BaseResponseDto } from './baseResponseDto';
 import { Logger } from '@app/logger';
+import { BaseError } from '@app/domain/error/invalidRequest.error';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
@@ -22,6 +24,20 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
   }
 }
 
+@Catch(BaseError)
+export class BaseErrorFilter implements ExceptionFilter<BaseError> {
+  constructor(private readonly logger: Logger) {}
+
+  catch(error: BaseError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+
+    response
+      .status(HttpStatus.BAD_REQUEST)
+      .json(BaseResponseDto.ERROR(error.response, error.errorCode));
+  }
+}
+
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: Logger) {}
@@ -30,8 +46,8 @@ export class AllExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
-    const status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-    response.status(status).json(BaseResponseDto.ERROR());
+    response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json(BaseResponseDto.ERROR());
   }
 }
