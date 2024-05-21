@@ -7,10 +7,14 @@ import { UserRepository } from './repository/userRepository';
 import { LoggerModule } from '@app/logger';
 import { AuthService } from './service/auth/auth.service';
 import { AuthRepository } from './repository/authRepository';
+import { RedisClient } from './client/redis.client';
+import { RedisConfig } from '@app/config/redisConfig';
+import { Redis } from 'ioredis';
 
 @Module({
   imports: [
     LoggerModule,
+    ConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [DatabaseConfig],
@@ -32,7 +36,25 @@ import { AuthRepository } from './repository/authRepository';
       },
     }),
   ],
-  providers: [UserService, UserRepository, AuthService, AuthRepository],
-  exports: [UserService, AuthService],
+  providers: [
+    UserService,
+    UserRepository,
+    AuthService,
+    AuthRepository,
+    {
+      provide: RedisClient,
+      inject: [RedisConfig],
+      useFactory: async (redisConfig: RedisConfig) => {
+        const redisClient = new Redis(redisConfig.port, redisConfig.host, {
+          lazyConnect: true,
+        });
+
+        await redisClient.connect();
+
+        return redisClient;
+      },
+    },
+  ],
+  exports: [UserService, AuthService, RedisClient],
 })
 export class DomainModule {}

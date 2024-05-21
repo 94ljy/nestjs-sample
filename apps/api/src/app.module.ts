@@ -1,5 +1,10 @@
-import { Module } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TraceInterceptor } from './common/interceptors/trace.interceptor';
 import { LoggerModule } from '@app/logger';
 import { HealthController } from './health-api/health.controller';
@@ -12,35 +17,35 @@ import { LogInterceptor } from './common/interceptors/log.interceptor';
 import { ApiAuthGuard } from './common/guards/auth.guard';
 import { AuthApiController } from './auth-api/auth-api.controller';
 import { DomainModule } from '@app/domain/domain.module';
+import { SessionMiddleware } from './common/middleware/session.middleware';
+
+const interceptors = [TraceInterceptor, LogInterceptor];
+const filters = [AllExceptionFilter, HttpExceptionFilter, BaseErrorFilter];
 
 @Module({
   controllers: [HealthController, AuthApiController],
   imports: [DomainModule, LoggerModule],
   providers: [
-    {
+    ...interceptors.map((interceptor) => ({
       provide: APP_INTERCEPTOR,
-      useClass: TraceInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LogInterceptor,
-    },
-    {
+      useClass: interceptor,
+    })),
+    ...filters.map((filter) => ({
       provide: APP_FILTER,
-      useClass: AllExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: BaseErrorFilter,
-    },
+      useClass: filter,
+    })),
     {
       provide: APP_GUARD,
       useClass: ApiAuthGuard,
     },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SessionMiddleware).forRoutes('*');
+  }
+}
