@@ -11,6 +11,13 @@ export class SessionMiddleware implements NestMiddleware {
 
   constructor(redisClient: RedisClient, appConfig: AppConfig) {
     this.handler = session({
+      name: 'sid',
+      cookie: {
+        secure: true,
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24,
+        sameSite: 'none',
+      },
       secret: appConfig.sessionSecret,
       resave: false,
       saveUninitialized: false,
