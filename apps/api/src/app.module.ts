@@ -18,13 +18,14 @@ import { ApiAuthGuard } from './common/guards/auth.guard';
 import { AuthApiController } from './auth-api/auth-api.controller';
 import { DomainModule } from '@app/domain/domain.module';
 import { SessionMiddleware } from './common/middleware/session.middleware';
+import { ConfigModule } from '@app/config/config.module';
 
 const interceptors = [TraceInterceptor, LogInterceptor];
 const filters = [AllExceptionFilter, HttpExceptionFilter, BaseErrorFilter];
 
 @Module({
   controllers: [HealthController, AuthApiController],
-  imports: [DomainModule, LoggerModule],
+  imports: [DomainModule, LoggerModule, ConfigModule],
   providers: [
     ...interceptors.map((interceptor) => ({
       provide: APP_INTERCEPTOR,

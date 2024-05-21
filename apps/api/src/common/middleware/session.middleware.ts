@@ -1,3 +1,4 @@
+import { AppConfig } from '@app/config/appConfig';
 import { RedisClient } from '@app/domain/client/redis.client';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import RedisStore from 'connect-redis';
@@ -8,9 +9,9 @@ import * as session from 'express-session';
 export class SessionMiddleware implements NestMiddleware {
   handler: RequestHandler;
 
-  constructor(redisClient: RedisClient) {
+  constructor(redisClient: RedisClient, appConfig: AppConfig) {
     this.handler = session({
-      secret: 'qweqwreqew',
+      secret: appConfig.sessionSecret,
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({
