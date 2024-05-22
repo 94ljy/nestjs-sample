@@ -10,6 +10,7 @@ import { AuthRepository } from './repository/authRepository';
 import { RedisClient } from './client/redis.client';
 import { RedisConfig } from '@app/config/redisConfig';
 import { Redis } from 'ioredis';
+import { AppConfig } from '@app/config/appConfig';
 
 @Module({
   imports: [
@@ -17,8 +18,8 @@ import { Redis } from 'ioredis';
     ConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [DatabaseConfig],
-      useFactory: (databaseConfig: DatabaseConfig) => {
+      inject: [DatabaseConfig, AppConfig],
+      useFactory: (databaseConfig: DatabaseConfig, appConfig: AppConfig) => {
         return {
           type: 'postgres',
           host: databaseConfig.host,
@@ -28,10 +29,12 @@ import { Redis } from 'ioredis';
           password: databaseConfig.password,
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: false,
-          ssl: {
-            // TODO: remove
-            rejectUnauthorized: false,
-          },
+          ssl:
+            appConfig.nodeEnv === 'local'
+              ? false
+              : {
+                  rejectUnauthorized: false,
+                },
         };
       },
     }),
@@ -42,6 +45,7 @@ import { Redis } from 'ioredis';
     AuthService,
     AuthRepository,
     {
+      // TODO: 별도의 모듈로 분리
       provide: RedisClient,
       inject: [RedisConfig],
       useFactory: async (redisConfig: RedisConfig) => {
