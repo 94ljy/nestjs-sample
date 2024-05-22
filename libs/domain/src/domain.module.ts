@@ -65,7 +65,7 @@ export class DomainModule implements OnApplicationShutdown {
 
   async onApplicationShutdown(signal?: string | undefined) {
     this.logger.log(
-      `${signal} signal received shutting down redis client`,
+      `Shutting down redis client with signal: ${signal}`,
       this.onApplicationShutdown.name,
     );
     await this.redisClient.quit();
