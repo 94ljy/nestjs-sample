@@ -1,27 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
 import * as winston from 'winston';
 import { LogTracer } from './logTracer';
 import { randomUUID } from 'crypto';
-import { AppConfig } from '@app/config/appConfig';
+import { INQUIRER } from '@nestjs/core';
 
-@Injectable()
+@Injectable({ scope: Scope.TRANSIENT })
 export class Logger {
-  private readonly logger: winston.Logger;
+  private parentClassName: string;
   constructor(
     private readonly logTracer: LogTracer,
-    appConfig: AppConfig,
+    private readonly logger: winston.Logger,
+    @Inject(INQUIRER) private parentClass: object,
   ) {
-    const formats = [winston.format.timestamp(), winston.format.json()];
-
-    if (appConfig.nodeEnv === 'local') {
-      formats.push(winston.format.prettyPrint());
-    }
-
-    this.logger = winston.createLogger({
-      level: 'info',
-      format: winston.format.combine(...formats),
-      transports: [new winston.transports.Console()],
-    });
+    this.parentClassName = this.parentClass?.constructor?.name;
   }
 
   private _log(
@@ -35,7 +26,7 @@ export class Logger {
     this.logger.log(level, {
       logId,
       traceId,
-      context,
+      context: `${this.parentClassName}.${context}`,
       message,
     });
   }

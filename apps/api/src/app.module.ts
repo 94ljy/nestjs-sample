@@ -52,7 +52,7 @@ export class AppModule implements NestModule, OnApplicationShutdown {
   onApplicationShutdown(signal?: string | undefined) {
     this.logger.log(
       `App Shutting down with signal: ${signal}`,
-      `${AppModule.name}.${this.onApplicationShutdown.name}`,
+      this.onApplicationShutdown.name,
     );
   }
 

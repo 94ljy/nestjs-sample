@@ -28,7 +28,7 @@ export class LogInterceptor implements NestInterceptor {
         query: request.query,
         body: request.body,
       },
-      LogInterceptor.name,
+      this.intercept.name,
     );
 
     return next.handle().pipe(
@@ -43,7 +43,7 @@ export class LogInterceptor implements NestInterceptor {
           body: body,
         };
 
-        this.logger.log(responseLog, LogInterceptor.name);
+        this.logger.log(responseLog, this.intercept.name);
       }),
       catchError((error) => {
         const responseTime = Date.now() - startTime;
@@ -56,7 +56,7 @@ export class LogInterceptor implements NestInterceptor {
           error: error,
         };
 
-        this.logger.error(responseLog, LogInterceptor.name);
+        this.logger.error(responseLog, this.intercept.name);
 
         throw error;
       }),
