@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationShutdown } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './service/user/user.service';
 import { ConfigModule } from '@app/config/config.module';
 import { DatabaseConfig } from '@app/config/databaseConfig';
 import { UserRepository } from './repository/userRepository';
-import { LoggerModule } from '@app/logger';
+import { Logger, LoggerModule } from '@app/logger';
 import { AuthService } from './service/auth/auth.service';
 import { AuthRepository } from './repository/authRepository';
 import { RedisClient } from './client/redis.client';
@@ -57,4 +57,17 @@ import { Redis } from 'ioredis';
   ],
   exports: [UserService, AuthService, RedisClient],
 })
-export class DomainModule {}
+export class DomainModule implements OnApplicationShutdown {
+  constructor(
+    private readonly redisClient: RedisClient,
+    private readonly logger: Logger,
+  ) {}
+
+  async onApplicationShutdown(signal?: string | undefined) {
+    this.logger.log(
+      `${signal} signal received shutting down redis client`,
+      `${DomainModule.name}.${this.onApplicationShutdown.name}`,
+    );
+    await this.redisClient.quit();
+  }
+}

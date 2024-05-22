@@ -9,6 +9,8 @@ async function bootstrap() {
 
   await app.listen(3000);
 
+  app.enableShutdownHooks();
+
   return app;
 }
 bootstrap();

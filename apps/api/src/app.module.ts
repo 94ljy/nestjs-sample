@@ -2,11 +2,12 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
+  OnApplicationShutdown,
   ValidationPipe,
 } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TraceInterceptor } from './common/interceptors/trace.interceptor';
-import { LoggerModule } from '@app/logger';
+import { Logger, LoggerModule } from '@app/logger';
 import { HealthController } from './health-api/health.controller';
 import {
   AllExceptionFilter,
@@ -45,7 +46,16 @@ const filters = [AllExceptionFilter, HttpExceptionFilter, BaseErrorFilter];
     },
   ],
 })
-export class AppModule implements NestModule {
+export class AppModule implements NestModule, OnApplicationShutdown {
+  constructor(private readonly logger: Logger) {}
+
+  onApplicationShutdown(signal?: string | undefined) {
+    this.logger.log(
+      `App Shutting down with signal: ${signal}`,
+      `${AppModule.name}.${this.onApplicationShutdown.name}`,
+    );
+  }
+
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SessionMiddleware).forRoutes('*');
   }
