@@ -14,7 +14,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/api/test/jest-e2e.json",
     "build:api": "nest build api",
-    "start:api:dev": "nest start --watch api",
+    "start:api:local": "nest start --watch api",
     "start:api:prod": "node dist/apps/api/src/main",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d ./migration-config.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ./migration-config.ts",
