@@ -7,9 +7,9 @@ async function bootstrap() {
   app.set('trust proxy', true);
   app.disable('x-powered-by');
 
-  await app.listen(3000);
-
   app.enableShutdownHooks();
+
+  await app.listen(3000);
 
   return app;
 }
