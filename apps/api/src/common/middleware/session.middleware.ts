@@ -13,7 +13,7 @@ export class SessionMiddleware implements NestMiddleware {
     this.handler = session({
       name: 'sid',
       cookie: {
-        secure: true,
+        secure: appConfig.nodeEnv === 'local' ? false : true,
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24,
         sameSite: 'none',
