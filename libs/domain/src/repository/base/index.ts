@@ -6,13 +6,15 @@ import {
   Repository,
 } from 'typeorm';
 
-export function BaseRepository<T extends ObjectLiteral>(a: EntityTarget<T>) {
+export function BaseRepository<T extends ObjectLiteral>(
+  entityTarget: EntityTarget<T>,
+) {
   class BaseRepository extends Repository<T> {
     @Inject(EntityManager)
     declare readonly manager: EntityManager;
 
     constructor() {
-      super(a, null as any);
+      super(entityTarget, null as any);
     }
   }
 
