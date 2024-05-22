@@ -17,7 +17,6 @@ export class LogInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const request = ctx.switchToHttp().getRequest<Request>();
-    const response = ctx.switchToHttp().getResponse();
 
     const startTime = Date.now();
 
@@ -39,7 +38,6 @@ export class LogInterceptor implements NestInterceptor {
           method: request.method,
           path: request.path,
           responseTime,
-          statusCode: response.statusCode,
           body: body,
         };
 
@@ -52,7 +50,6 @@ export class LogInterceptor implements NestInterceptor {
           method: request.method,
           path: request.path,
           responseTime,
-          statusCode: response.statusCode,
           error: error,
         };
 
