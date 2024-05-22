@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as DotEnv from 'dotenv';
 
-DotEnv.config({ path: './env/.env.local' });
+DotEnv.config({ path: './env/.local.env' });
 
 const host = process.env.DATABASE_HOST || 'localhost';
 const port = Number(process.env.DATABASE_PORT) || 5432;
@@ -18,9 +18,7 @@ const dataSource = new DataSource({
   password: password,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/*.ts'],
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: false,
 });
 
 export default dataSource;
