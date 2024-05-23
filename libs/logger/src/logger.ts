@@ -9,7 +9,7 @@ export class Logger {
   private parentClassName: string;
   constructor(
     private readonly logTracer: LogTracer,
-    private readonly logger: winston.Logger,
+    private readonly winstonLogger: winston.Logger,
     @Inject(INQUIRER) private parentClass: object,
   ) {
     this.parentClassName = this.parentClass?.constructor?.name;
@@ -23,7 +23,7 @@ export class Logger {
     const traceId = this.logTracer.getTraceId();
     const logId = randomUUID();
 
-    this.logger.log(level, {
+    this.winstonLogger.log(level, {
       logId,
       traceId,
       context: `${this.parentClassName}.${context}`,
