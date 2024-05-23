@@ -20,13 +20,14 @@ import { AuthApiController } from './auth-api/auth-api.controller';
 import { DomainModule } from '@app/domain/domain.module';
 import { SessionMiddleware } from './common/middleware/session.middleware';
 import { ConfigModule } from '@app/config/config.module';
+import { RedisModule } from '@app/redis/redis.module';
 
 const interceptors = [TraceInterceptor, LogInterceptor];
 const filters = [AllExceptionFilter, HttpExceptionFilter, BaseErrorFilter];
 
 @Module({
   controllers: [HealthController, AuthApiController],
-  imports: [DomainModule, LoggerModule, ConfigModule],
+  imports: [DomainModule, LoggerModule, ConfigModule, RedisModule],
   providers: [
     ...interceptors.map((interceptor) => ({
       provide: APP_INTERCEPTOR,

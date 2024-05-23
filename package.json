@@ -93,7 +93,8 @@
       "^@app/domain(|/.*)$": "<rootDir>/libs/domain/src/$1",
       "^@app/ddd(|/.*)$": "<rootDir>/libs/ddd/src/$1",
       "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
-      "^@app/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
+      "^@app/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
+      "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1"
     }
   }
 }

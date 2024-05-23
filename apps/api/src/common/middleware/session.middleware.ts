@@ -1,5 +1,5 @@
 import { AppConfig } from '@app/config/appConfig';
-import { RedisClient } from '@app/domain/client/redis.client';
+import { RedisClient } from '@app/redis/redis.client';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import RedisStore from 'connect-redis';
 import { NextFunction, Request, Response, RequestHandler } from 'express';
