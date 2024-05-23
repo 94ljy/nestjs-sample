@@ -21,9 +21,9 @@ import { AppConfig } from '@app/config/appConfig';
         }
 
         return winston.createLogger({
-          level: 'info',
+          level: appConfig.nodeEnv === 'local' ? undefined : 'info',
           format: winston.format.combine(...formats),
-          transports: [new winston.transports.Console()],
+          transports: [new winston.transports.Console({})],
         });
       },
     },
