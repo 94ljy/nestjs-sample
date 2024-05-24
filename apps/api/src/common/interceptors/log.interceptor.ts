@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  ContextType,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable, catchError, tap } from 'rxjs';
@@ -16,29 +17,38 @@ export class LogInterceptor implements NestInterceptor {
     ctx: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    const request = ctx.switchToHttp().getRequest<Request>();
-
     const startTime = Date.now();
 
-    this.logger.log(
-      {
+    const requestHandler = `${ctx.getClass().name}.${ctx.getHandler().name}`;
+    const requestType = ctx.getType();
+
+    const contextInfo = {
+      requestHandler,
+      requestType,
+    };
+
+    if (requestType === 'http') {
+      const request = ctx.switchToHttp().getRequest<Request>();
+
+      contextInfo[requestType] = {
+        url: request.url,
         method: request.method,
-        path: request.path,
+        // TODD: masking sensitive data
         query: request.query,
         body: request.body,
-      },
-      this.intercept.name,
-    );
+      };
+    }
+
+    this.logger.log(contextInfo, this.intercept.name);
 
     return next.handle().pipe(
       tap((body) => {
         const responseTime = Date.now() - startTime;
 
         const responseLog = {
-          method: request.method,
-          path: request.path,
+          ...contextInfo,
           responseTime,
-          body: body,
+          response: body,
         };
 
         this.logger.log(responseLog, this.intercept.name);
@@ -47,10 +57,9 @@ export class LogInterceptor implements NestInterceptor {
         const responseTime = Date.now() - startTime;
 
         const responseLog = {
-          method: request.method,
-          path: request.path,
+          ...contextInfo,
           responseTime,
-          error: error,
+          error,
         };
 
         this.logger.error(responseLog, this.intercept.name);
