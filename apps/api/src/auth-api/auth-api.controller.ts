@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { SignupRequestDto } from './dto/signupRequest.dto';
-import { BaseResponseDto } from '../common/baseResponseDto';
+import { BaseResponseDto } from '../common/dto/baseResponse.dto';
 import { UserService } from '@app/domain/service/user/user.service';
 import { CreateUserDto } from '@app/domain/service/user/dto/createUser.dto';
 import { SigninRequestDto } from './dto/signinRequest.dto';

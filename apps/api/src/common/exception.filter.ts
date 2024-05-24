@@ -6,7 +6,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
-import { BaseResponseDto } from './baseResponseDto';
+import { BaseResponseDto } from './dto/baseResponse.dto';
 import { Logger } from '@app/logger';
 import { BaseError } from '@app/domain/error/invalidRequest.error';
 

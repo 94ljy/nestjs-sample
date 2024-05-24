@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { BaseResponseDto } from '../common/baseResponseDto';
+import { BaseResponseDto } from '../common/dto/baseResponse.dto';
 import { Public } from '../common/guards/public.decorator';
 
 @Controller()
