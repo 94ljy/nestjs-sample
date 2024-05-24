@@ -10,6 +10,10 @@ export class SessionMiddleware implements NestMiddleware {
   handler: RequestHandler;
 
   constructor(redisClient: RedisClient, appConfig: AppConfig) {
+    const store = new RedisStore({
+      client: redisClient,
+    });
+
     this.handler = session({
       name: 'sid',
       cookie: {
@@ -21,9 +25,7 @@ export class SessionMiddleware implements NestMiddleware {
       secret: appConfig.sessionSecret,
       resave: false,
       saveUninitialized: false,
-      store: new RedisStore({
-        client: redisClient,
-      }),
+      store,
     });
   }
 
