@@ -1,5 +1,6 @@
 export const ErrorCode = {
-  INVALID_REQUEST: 100, // 별도의 핸들링이 필요 없는 경우
+  INVALID_REQUEST: 400, // 클라이언트 에러
+  INTERNAL_SERVER_ERROR: 500, // 서버 에러
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

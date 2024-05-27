@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { BaseResponseDto } from './dto/baseResponse.dto';
 import { Logger } from '@app/logger';
-import { BaseError } from '@app/domain/error/invalidRequest.error';
+import { BaseError, ErrorCode } from '@app/domain/error/invalidRequest.error';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
@@ -20,7 +20,19 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
 
     const status = exception.getStatus();
 
-    response.status(status).json(BaseResponseDto.ERROR());
+    const body = exception.getResponse();
+    if (body instanceof Object) {
+      delete body['error'];
+      delete body['statusCode'];
+    }
+
+    let errorCode: ErrorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+
+    if (status > 400 && status < 500) {
+      errorCode = ErrorCode.INVALID_REQUEST;
+    }
+
+    response.status(status).json(BaseResponseDto.ERROR(body, errorCode));
   }
 }
 
